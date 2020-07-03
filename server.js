@@ -9,6 +9,7 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
     if (err) return console.log(err);
     const db = client.db('jokester');
     const usersCollection = db.collection('users');
+    const jokesCollection = db.collection('jokes');
 
     app.use(cors());
     
@@ -23,6 +24,16 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
             res.send({currentUser : req.body.username});
         })
         .catch((error) => res.status(400).send(error));
+    });
+
+    app.post('/jokes', function(req, res){
+        console.log('Just got a post request to jokes!')
+        const newJoke = {username: req.body.username ,setup : req.body.setup, punchline: req.body.punchline, likedBy : [], dislikedBy : []}
+        jokesCollection.insertOne(newJoke)
+        .then((result) => {
+            res.send()
+        })
+        .catch((error) => res.status(400).send());
     });
 
     app.listen(4001, () => {
