@@ -15,6 +15,18 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
     
     app.use(bodyParser.json());
 
+    app.post('/:username', function(req, res) {
+        console.log('Just got a get request to users!')
+        usersCollection.findOne({_id : req.params.username})
+        .then((result) => {
+            if(req.body.password === result.password){
+                res.send({currentUser : req.params.username})
+            }
+            res.status(400).send();
+        })
+        .catch((error) => res.status(400).send());
+    });
+
     app.post('/users', function(req, res) {
         console.log('Just got a post request to users!')
         const newUser = {_id : req.body.username, password: req.body.password};
