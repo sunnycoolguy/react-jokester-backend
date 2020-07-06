@@ -80,6 +80,18 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
         .catch((error) => res.status(400).send(error));
     })
 
+    app.delete('/jokes/:username/:id', function(req, res){
+        console.log(`Deleting joke ${req.params.id} from ${req.params.username} jokes!`);
+        jokesCollection.deleteOne({_id : req.params.id})
+        .then(() => {
+            jokesCollection.find({username : req.params.username}).toArray()
+            .then((result) => res.status(200).send(result));
+        })
+        .catch((error) => res.status(400).send(error));
+    })
+
+
+
     app.listen(4001, () => {
         console.log('I am listening!');
     })
