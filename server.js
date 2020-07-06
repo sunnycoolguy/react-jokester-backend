@@ -16,10 +16,30 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
     
     app.use(bodyParser.json());
 
+    app.get('/jokes', function(req, res){
+        console.log('Getting jokes!');
+        jokesCollection.find({}).toArray()
+        .then((result) => res.send({jokes : result}))
+        .catch((error) => res.status(400).send(error));
+    })
+
+    app.get('/jokes/:username', function(req, res){
+        console.log(`Getting ${req.params.username}'s jokes!`);
+        jokesCollection.find({username : req.params.username}).toArray()
+        .then((result) => res.send({jokes : result}))
+        .catch((error) => res.status(400).send(error));
+    })
+    
+    app.get('/jokes/:username/:id', function(req, res){
+        console.log(`Getting joke ${req.params.id} from ${req.params.username} jokes!`);
+        jokesCollection.findOne({_id : req.params.id})
+        .then((result) => res.send({joke : result}))
+        .catch((error) => res.status(400).send(error));
+    })
     
     app.post('/jokes', function(req, res){
         console.log('Posting joke!')
-        const newJoke = {_id: uniqid.time(),username: req.body.username ,setup : req.body.setup, punchline: req.body.punchline, likedBy : [], dislikedBy : []}
+        const newJoke = {_id: uniqid.time(),username: req.body.username ,setup : req.body.setup, punchline: req.body.punchline, likes: 0, dislikes: 0, likedBy : [], dislikedBy : []}
         jokesCollection.insertOne(newJoke)
         .then((result) => {
             res.send()
@@ -51,6 +71,14 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
         })
         .catch((error) => res.status(400).send(error));
     });
+
+    app.put('/jokes/:username/:id', function(req, res){
+        console.log(`Editing joke ${req.params.id} from ${req.params.username} jokes!`);
+        const newJoke = { $set: {setup: req.body.setup, punchline: req.body.punchline } };
+        jokesCollection.updateOne({_id : req.params.id}, newJoke)
+        .then((result) => res.status(200).send(result))
+        .catch((error) => res.status(400).send(error));
+    })
 
     app.listen(4001, () => {
         console.log('I am listening!');
