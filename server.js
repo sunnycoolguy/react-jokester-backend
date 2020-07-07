@@ -39,24 +39,10 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
     
     app.post('/jokes', function(req, res){
         console.log('Posting joke!')
-        const newJoke = {_id: uniqid.time(),username: req.body.username ,setup : req.body.setup, punchline: req.body.punchline, likes: 0, dislikes: 0, likedBy : [], dislikedBy : []}
+        const newJoke = {_id: uniqid.time(),username: req.body.username ,setup : req.body.setup, punchline: req.body.punchline}
         jokesCollection.insertOne(newJoke)
         .then((result) => {
             res.send()
-        })
-        .catch((error) => res.status(400).send());
-    });
-
-
-    
-    app.post('/:username', function(req, res) {
-        console.log('Logging user in!')
-        usersCollection.findOne({_id : req.params.username})
-        .then((result) => {
-            if(req.body.password === result.password){
-                res.send({currentUser : req.params.username})
-            }
-            res.status(400).send();
         })
         .catch((error) => res.status(400).send());
     });
@@ -71,6 +57,20 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
         })
         .catch((error) => res.status(400).send(error));
     });
+    
+    app.post('/:username', function(req, res) {
+        console.log('Logging user in!')
+        usersCollection.findOne({_id : req.params.username})
+        .then((result) => {
+            if(req.body.password === result.password){
+                res.send({currentUser : req.params.username})
+            }
+            res.status(400).send();
+        })
+        .catch((error) => res.status(400).send());
+    });
+
+
 
     app.put('/jokes/:username/:id', function(req, res){
         console.log(`Editing joke ${req.params.id} from ${req.params.username} jokes!`);
