@@ -1,0 +1,1 @@
+This is the repo for the backend of my Jokester app! It implements a fully CRUD API that allows users to interact with a MongoDB instance running on my computer. Some refactoring might be in order using `express.Router()`.
